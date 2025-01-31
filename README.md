@@ -4,6 +4,12 @@ A Model Context Protocol (MCP) server for linkedin to apply Jobs and search thro
 
 This uses Unoffical [Linkedin API Docs](https://linkedin-api.readthedocs.io/en/latest/api.html) for hitting at the clients Credentials.
 
+## Requirements
+
+- Python 3.12 or higher
+- `asyncio`
+- Any additional Python packages can be found in `requirements.txt`.
+
 ---
 
 # Configuration
