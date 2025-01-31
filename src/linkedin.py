@@ -3,6 +3,7 @@ from fastmcp import FastMCP
 from dotenv import load_dotenv
 import os
 import logging
+import spacy
 from typing import List, Dict
 from datetime import datetime, timedelta
 from PyPDF2 import PdfReader
@@ -12,6 +13,7 @@ load_dotenv()
 mcp = FastMCP("LinkedIn-MCP")
 logger = logging.getLogger(__name__)
 pdf_path = "Resume.pdf"
+
 
 def get_creds():
     return Linkedin(os.getenv("LINKEDIN_EMAIL"), os.getenv("LINKEDIN_PASSWORD"), debug=True)
@@ -84,23 +86,23 @@ def search_jobs(
         logger.error(f"Search failed: {str(e)}")
         return {"error": "Job search failed - check auth or parameters"}
 
-def parse_job(job_data: Dict) -> Dict:
-    """Normalize LinkedIn job structure to MCP standard"""
-    return {
-        "title": job_data.get("title"),
-        "company": job_data.get("companyName"),
-        "location": job_data.get("formattedLocation"),
-        "posted": datetime.fromtimestamp(job_data.get("listedAt")/1000).strftime('%Y-%m-%d'),
-        "apply_url": job_data.get("applyMethod", {}).get("easyApplyUrl"),
-        "skills": extract_skills(job_data.get("description", "")),
-        "experience": job_data.get("formattedExperienceLevel"),
-        "remote": "Remote" in job_data.get("formattedLocation", "")
-    }
+# def parse_job(job_data: Dict) -> Dict:
+#     """Normalize LinkedIn job structure to MCP standard"""
+#     return {
+#         "title": job_data.get("title"),
+#         "company": job_data.get("companyName"),
+#         "location": job_data.get("formattedLocation"),
+#         "posted": datetime.fromtimestamp(job_data.get("listedAt")/1000).strftime('%Y-%m-%d'),
+#         "apply_url": job_data.get("applyMethod", {}).get("easyApplyUrl"),
+#         "skills": extract_skills(job_data.get("description", "")),
+#         "experience": job_data.get("formattedExperienceLevel"),
+#         "remote": "Remote" in job_data.get("formattedLocation", "")
+#     }
 
-def extract_skills(description: str) -> List[str]:
-    """Simple skill extraction from description (enhance with NLP)"""
-    SKILLS_DB = ["Python", "AWS", "React", "SQL"]
-    return [skill for skill in SKILLS_DB if skill.lower() in description.lower()]
+# def extract_skills(description: str) -> List[str]:
+#     """Simple skill extraction from description (enhance with NLP)"""
+#     SKILLS_DB = ["Python", "AWS", "React", "SQL"]
+#     return [skill for skill in SKILLS_DB if skill.lower() in description.lower()]
 
 @mcp.tool()
 def save_search_preferences(
@@ -134,9 +136,27 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         return f"Error Extracting Text: {str(e)}"
 
 
-    
 
-def parsed_resume(resume:str):
+def parsed_resume() -> Dict:
+    """Parse resume text into structured data"""
+    
+    resume = extract_text_from_pdf(pdf_path)
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(resume)
+    
+    parsed_data = {
+        "name": extract_name(doc),
+        "email":extract_email(resume),
+        "phone": extract_phone(resume),
+        "skills": extract_skills(doc),
+        "experience": extract_experience(doc),
+        "education": extract_education(doc),
+        "languages": extract_languages(doc)
+    }
+    
+    return parsed_data
+    
+    
     
 # list all the specs based on resume?
 # and search automatically?
