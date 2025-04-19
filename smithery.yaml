@@ -1,0 +1,22 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required: []
+    properties:
+      linkedinEmail:
+        type: string
+        description: LinkedIn account email
+      linkedinPassword:
+        type: string
+        description: LinkedIn account password
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'python', args: ['-u', 'src/linkedin.py'], env: { LINKEDIN_EMAIL: config.linkedinEmail, LINKEDIN_PASSWORD: config.linkedinPassword } })
+  exampleConfig:
+    linkedinEmail: user@example.com
+    linkedinPassword: mysecretpassword
