@@ -1,5 +1,7 @@
 # MCP Server for LinkedIn
 
+[![smithery badge](https://smithery.ai/badge/@Hritik003/linkedin-mcp)](https://smithery.ai/server/@Hritik003/linkedin-mcp)
+
 A Model Context Protocol (MCP) server for linkedin to apply Jobs and search through feed seamlessly. 
 
 This uses Unoffical [Linkedin API Docs](https://linkedin-api.readthedocs.io/en/latest/api.html) for hitting at the clients Credentials.
